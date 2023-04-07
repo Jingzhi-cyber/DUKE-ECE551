@@ -1,0 +1,8 @@
+input_empty.txt
+input_some_spaces.txt
+input.txt
+input_normal.txt
+input_normal2.txt
+input_error.txt
+
+input_empty.txt input.txt

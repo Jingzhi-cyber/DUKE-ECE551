@@ -1,0 +1,100 @@
+story-step1 story.txt
+story-step2 words1.txt
+story-step2 words2.txt
+sotry-step2 words_empty.txt
+story-step3 words1.txt story.txt
+story-step4 words1.txt story.txt
+story-step4 -n words1.txt story.txt
+story-step3 words_empty.txt story.txt
+story-step4 words_empty.txt story.txt
+story-step4 -n words_empty.txt story.txt
+story-step3 words_2.txt story.txt
+story-step4 words_2.txt story.txt
+story-step4 -n words_2.txt story.txt
+
+
+story-step1 story2.txt
+story-step3 words1.txt story2.txt
+story-step4 words1.txt story2.txt
+story-step4 -n words1.txt story2.txt
+story-step3 words_empty.txt story2.txt
+story-step4 words_empty.txt story2.txt
+story-step4 -n words_empty.txt story2.txt
+story-step3 words2.txt story2.txt
+story-step4 words2.txt story2.txt
+story-step4 -n words2.txt story2.txt
+
+
+story-step1 story3.txt
+story-step3 words1.txt story3.txt
+story-step4 words1.txt story3.txt
+story-step4 -n words1.txt story3.txt
+story-step3 words_empty.txt story3.txt
+story-step4 words_empty.txt story3.txt
+story-step4 -n words_empty.txt story3.txt
+story-step3 words2.txt story3.txt
+story-step4 words2.txt story3.txt
+story-step4 -n words2.txt story3.txt
+
+story-step1 story4.txt
+story-step3 words1.txt story4.txt
+story-step4 words1.txt story4.txt
+story-step4 -n words1.txt story4.txt
+story-step3 words_empty.txt story4.txt
+story-step4 words_empty.txt story4.txt
+story-step4 -n words_empty.txt story4.txt
+story-step3 words2.txt story4.txt
+story-step4 words2.txt story4.txt
+story-step4 -n words2.txt story4.txt
+
+
+
+
+story-step1 story5.txt
+story-step3 words1.txt story5.txt
+story-step4 words1.txt story5.txt
+story-step4 -n words1.txt story5.txt
+story-step3 words_empty.txt story5.txt
+story-step4 words_empty.txt story5.txt
+story-step4 -n words_empty.txt story5.txt
+story-step3 words2.txt story5.txt
+story-step4 words2.txt story5.txt
+story-step4 -n words2.txt story5.txt
+
+
+story-step1 story6.txt
+story-step3 words1.txt story6.txt
+story-step4 words1.txt story6.txt
+story-step4 -n words1.txt story6.txt
+story-step3 words_empty.txt story6.txt
+story-step4 words_empty.txt story6.txt
+story-step4 -n words_empty.txt story6.txt
+story-step3 words2.txt story6.txt
+story-step4 words2.txt story6.txt
+story-step4 -n words2.txt story6.txt
+
+story-step1 story7.txt
+story-step3 words1.txt story7.txt
+story-step4 words1.txt story7.txt
+story-step4 -n words1.txt story7.txt
+story-step3 words_empty.txt story7.txt
+story-step4 words_empty.txt story7.txt
+story-step4 -n words_empty.txt story7.txt
+story-step3 words2.txt story7.txt
+story-step4 words2.txt story7.txt
+story-step4 -n words2.txt story7.txt
+
+
+
+story-step1 story8.txt
+story-step3 words1.txt story8.txt
+story-step4 words1.txt story8.txt
+story-step4 -n words1.txt story8.txt
+story-step3 words_empty.txt story8.txt
+story-step4 words_empty.txt story8.txt
+story-step4 -n words_empty.txt story8.txt
+story-step3 words2.txt story8.txt
+story-step4 words2.txt story8.txt
+story-step4 -n words2.txt story8.txt
+
+

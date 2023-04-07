@@ -1,0 +1,66 @@
+Grading at 09/12/2022:01:17:51.968498
+For commit ID a8e97188d38932dbdd794631efb8a0e6284e8010
+Grading at Sun Sep 11 09:17:51 PM EDT 2022
+**Testing broken implementation 10 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 2. THe expected answer is 8.
+
+**Testing broken implementation 11 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 0. THe expected answer is -45967296.
+
+**Testing broken implementation 1 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 2. THe expected answer is 8.
+
+**Testing broken implementation 2 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 9. THe expected answer is 8.
+
+**Testing broken implementation 3 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 0. THe expected answer is 1.
+
+**Testing broken implementation 4 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 38976. THe expected answer is -45967296.
+
+**Testing broken implementation 5 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 0. THe expected answer is 8.
+
+**Testing broken implementation 6 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 2. THe expected answer is -45967296.
+
+**Testing broken implementation 7 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 27. THe expected answer is 8.
+
+**Testing broken implementation 8 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 6. THe expected answer is 8.
+
+**Testing broken implementation 9 **
+-------------------------------------
+
+ENCOUNTER REEOR! Your answer is 0. THe expected answer is 8.
+
+**Testing correct implementation **
+-------------------------------------
+
+
+All tests were ok.
+
+
+Overall Grade: PASSED

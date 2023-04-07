@@ -1,0 +1,29 @@
+#error
+printCountries invalid.csv
+printDailyMax population.csv
+printCountries invalid_one_line_empty.csv
+printCumulative population.csv invalid_empty.csv
+printRunningAvg population.csv invalid_empty.csv
+printDailyMax population.csv invalid_empty.csv
+printCountries inval_nodigits.csv
+printCumulative population.csv invalid_data.csv
+printRunningAvg population.csv invalid_data.csv
+printDailyMax population.csv invalid_data.csv
+printCountries invalid_toolongname.csv 
+
+#success
+printCountries population.csv
+printDailyMax population.csv daily_small.csv
+printDailyMax population.csv invalid_5data.csv
+printRunningAvg population.csv daily_small.csv
+printCumulative population.csv invalid_5data.csv
+printCumulative population.csv daily_small.csv
+printCountries invalid_empty.csv
+printCountries invalid_emptyspace.csv
+printCountries invalid_minus_sign.csv
+printRunningAvg population.csv invalid_5data.csv
+printDailyMax population.csv daily_cases.csv
+printRunningAvg population.csv daily_cases.csv
+printCumulative population.csv daily_cases.csv
+printCountries valid_space.csv
+printCountries invalid_toolongpop.csv

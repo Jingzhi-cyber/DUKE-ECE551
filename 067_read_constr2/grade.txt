@@ -1,0 +1,10 @@
+Grading at 10/22/2022:20:14:11.406550
+For commit ID 03ee2e76139006bac03998e4e3703131f2b82551
+Grading at Sat Oct 22 04:14:11 PM EDT 2022
+Attempting to compile:
+g++ -std=gnu++98 -Wall -Werror -pedantic -c code.cpp
+g++ -o code code.o
+Your file matched the expected output
+Your output matched what we expected
+
+Overall Grade: PASSED

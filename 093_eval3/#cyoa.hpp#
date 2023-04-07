@@ -1,0 +1,251 @@
+#ifndef __T_CYOA_H__
+#define __T_CYOA_H__
+
+#include <fstream>
+#include <list>
+#include <map>
+#include <set>
+#include <stack>
+#include <string>
+#include <utility>
+#include <vector>
+
+using std::list;
+using std::map;
+using std::pair;
+using std::set;
+using std::stack;
+using std::string;
+using std::vector;
+
+// function to checkFileStream
+void checkFile(std::ifstream & fileToRead, string & fileDirectory);
+
+// function to open file
+std::ifstream * openFile(string & fileDirectory);
+
+// function to get the text in file
+vector<string> getText(string & fileDirectory);
+
+// fucntion to get a input line from user
+string getInputFromUser();
+
+class Choice {
+ private:
+  size_t pageNum;
+  size_t choiceNum;
+  size_t jumpPageNum;
+  string choiceText;
+  bool isConditional;
+  pair<string, long int> condition;
+
+ public:
+  Choice();
+  Choice(size_t _pageNum, size_t _choiceNum, size_t _jumpPageNum, string _choiceText);
+  Choice(size_t _pageNum,
+         size_t _choiceNum,
+         size_t _jumpPageNum,
+         string _choiceText,
+         pair<string, long int> _condition);
+
+  size_t getDestPageNum() const;
+  void printChoice() const;
+  size_t getChoiceIndex() const;
+  void printUnavailable() const;
+  bool getIsConditional() const;
+  pair<string, long int> getCondition() const;
+};
+
+class Page {
+ private:
+  char type;
+  size_t pageNum;
+  string pageName;
+  string pageDirectory;
+  vector<string> pageText;
+  stack<pair<string, long int> > variablesToSet;
+
+  void assignVariables(map<string, long int> & variables);
+
+ public:
+  Page();
+  Page(char _type,
+       size_t _pageNum,
+       string _pageName,
+       string _pageDirectory,
+       vector<string> _pageText);
+
+  Page(char _type, size_t _pageNum, string _pageName, string _pageDirectory);
+
+  virtual ~Page();
+  char getType() const;
+  size_t getPageNum() const;
+  void addOnePairToStack(const pair<string, long int> & variable);
+
+  virtual void printPage(map<string, long int> & variables);
+  virtual vector<size_t> getDestPageNumArray() const = 0;
+  virtual void addOneChoice(const Choice & newChoice) = 0;
+  virtual size_t getChoiceNum() = 0;
+  virtual vector<size_t> getUnavailableChoices(
+      const map<string, long int> & variables) = 0;
+};
+
+class NormalPage : public Page {
+ private:
+  vector<Choice> choiceVector;
+
+ public:
+  NormalPage();
+  NormalPage(char _type,
+             size_t _pageNum,
+             string _pageName,
+             string _pageDirectoty,
+             vector<string> _pageText,
+             vector<Choice> _choiceVector);
+  NormalPage(char _type,
+             size_t _pageNum,
+             string _pageName,
+             string _pageDirectory,
+             vector<Choice> _choiceVevtor);
+
+  NormalPage(char _type, size_t _pageNum, string _pageName, string _pageDirectory);
+
+  virtual ~NormalPage();
+
+  virtual void addOneChoice(const Choice & newChoice);
+  virtual vector<size_t> getDestPageNumArray() const;
+  virtual size_t getChoiceNum();
+  virtual vector<size_t> getUnavailableChoices(const map<string, long int> & variables);
+
+  virtual void printPage(map<string, long int> & variables);  // overload << operator
+};
+
+class WinPage : public Page {
+ public:
+  WinPage();
+  WinPage(char _type, size_t _pageNum, string _pageName, string _pageDirectory);
+
+  virtual ~WinPage();
+
+  virtual void addOneChoice(const Choice & newChoice);
+  virtual size_t getChoiceNum();
+  virtual vector<size_t> getDestPageNumArray() const;
+  virtual vector<size_t> getUnavailableChoices(const map<string, long int> & variables);
+
+  virtual void printPage(map<string, long int> & variables);  // overload << operator
+};
+
+class LosePage : public Page {
+ public:
+  LosePage();
+  LosePage(char _type, size_t _pageNum, string _pageName, string _pageDirectory);
+
+  virtual ~LosePage();
+
+  virtual void addOneChoice(const Choice & newChoice);
+  virtual size_t getChoiceNum();
+  virtual vector<size_t> getDestPageNumArray() const;
+  virtual vector<size_t> getUnavailableChoices(const map<string, long int> & variables);
+
+  virtual void printPage(map<string, long int> & variables);  // overload << operator
+};
+
+class Story {
+ private:
+  string directory;
+  vector<Page *> pageVector;
+  map<string, long int> variables;
+
+  size_t getChoiceFromUser() const;  // Get user's choice
+
+ public:
+  void printPage(size_t pageNum, map<string, long int> & variables)
+      const;  // print one page and check Win or Lose
+
+  Story();
+  Story(string _directory,
+        int pageNumCheck = 0);  // defaultly, do not perform pagenumcheck
+  Story(const Story & rhs);
+
+  Story & operator=(const Story & rhs);
+  ~Story();
+
+  void printStory();          // overload << operator
+  void startAdventure();      // strat the game
+  void printWinPath() const;  // print all winning pathes
+};
+
+// function to check whether a line is blank
+bool isBlank(string line);
+
+// function to add one page
+void addPage(vector<Page *> & pageVector,
+             char type,
+             size_t pageNum,
+             string pageName,
+             string pageDirectory);
+// function to check whether a page number is valid
+bool isValidNumber(string & line, char *& afterPageNum, size_t & pageNum);
+
+// function to check whether a value for a story variable is valid
+bool isValidVariableValue(string & line,
+                          char *& afterVariableValue,
+                          long int & variableValue);
+
+// fucntion to check whether a line is a page declaration. If it is, then add one page.
+bool isPage(string line, vector<Page *> & pageVector, string directory);
+
+// function to add one choice
+void addChoice(vector<Page *> & pageVector,
+               size_t pageNum,
+               size_t destPageNum,
+               string text,
+               pair<string, long int> condition,
+               bool isCondition);
+
+// fucntion to check whether a line is a choice declaration. If it is, then add one choice.
+bool isChoice(string line, vector<Page *> & pageVector);
+
+// fucntion to check whether a line is a conditional choice declaration. If it is, then add one choice and set its condition.
+bool isConditionalChoice(string line, vector<Page *> & pageVector);
+
+// function to add one variable with its name and value to the stack in the corresponding Page object
+void addOneStoryVaribale(vector<Page *> & pageVector,
+                         const pair<string, long int> & variableToSet,
+                         const size_t & pageNum);
+
+// fucntion to check whether a line is a declaration to set one story varibale.  If it is, then add one variable with its name and value to the stack in the corresponding Page object.
+bool isSetStoryVariable(string line,
+                        vector<Page *> & pageVector,
+                        map<string, long int> & variables);
+
+// template function to check whether a type is in an array of types
+template<typename T>
+bool checkTypeInArray(const T & element, const vector<T> & elementArray) {
+  typename vector<T>::const_iterator it = elementArray.begin();
+  while (it != elementArray.end()) {
+    if (*it == element) {
+      return true;
+    }
+    ++it;
+  }
+
+  return false;
+}
+
+// function to check all the destPageNum in choices can be matched to pageNum. And make sure every page(except page 0) is referenced at least once.
+bool checkDestPageNum(const vector<Page *> & pageVector);
+
+// function to check at least one Win page and at least one Lose page
+void checkWinLosePage(const vector<Page *> & pageVector);
+
+// function to check argc
+void checkArgc(const int & argc);
+
+// function to obtain all winning pathes
+void findWinPath(list<stack<size_t> > & allWinPathes, const vector<Page *> & pageVector);
+
+// function to print a winning path
+void printOneWinPath(stack<size_t> & oneWinPath, const vector<Page *> & pageVector);
+
+#endif

@@ -1,0 +1,9 @@
+3cyoa-step1 story1
+
+cyoa-step2 story1  <  ./story1/inputs/self0.txt
+
+cyoa-step3 story2
+
+cyoa-step4 /usr/local/ece551/cyoa/story3 < /usr/local/ece551/cyoa/story3/inputs/input20.txt
+cyoa-step4 ./story3  <  ./story3/inputs/self0.txt
+

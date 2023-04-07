@@ -1,0 +1,76 @@
+Grading at 09/16/2022:00:20:20.225266
+For commit ID 292b3dcb884891c0b173ae963148a32be229b69d
+Grading at Thu Sep 15 08:20:19 PM EDT 2022
+**Testing broken implementation 10 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 3, the expected result is 2
+ 
+**Testing broken implementation 11 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 5, the expected result is 4
+ 
+**Testing broken implementation 1 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 7, the expected result is 4
+ 
+**Testing broken implementation 2 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 1, the expected result is 4
+ 
+**Testing broken implementation 3 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 7, the expected result is 6
+ 
+**Testing broken implementation 4 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 1, the expected result is 0
+ 
+**Testing broken implementation 5 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 7, the expected result is 4
+ 
+**Testing broken implementation 6 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 0, the expected result is 1
+ 
+**Testing broken implementation 7 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is -1, the expected result is 5
+ 
+**Testing broken implementation 8 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 1, the expected result is 5
+ 
+**Testing broken implementation 9 **
+-------------------------------------
+
+Your function fails to match the expected output!
+Your result is 1, the expected result is 4
+ 
+**Testing correct implementation **
+-------------------------------------
+
+
+All test programs were handled correctly
+
+Overall Grade: PASSED

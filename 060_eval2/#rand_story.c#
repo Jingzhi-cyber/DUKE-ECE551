@@ -1,0 +1,534 @@
+#include "rand_story.h"
+// Step1
+FILE * openFile(char * fileName) {
+  FILE * file = fopen(fileName, "r");
+  if (file == NULL) {
+    fprintf(stderr, "Can not open file: %s\n", fileName);
+    exit(EXIT_FAILURE);
+  }
+
+  return file;
+}
+
+char ** getLinesInFile(FILE * file, size_t * numberOfLines) {
+  char ** lines = NULL;
+  char * currentLine = NULL;
+  *numberOfLines = 0;
+  size_t linecap;
+  while (getline(&currentLine, &linecap, file) >= 0) {
+    lines = realloc(lines, (*numberOfLines + 1) * sizeof(*lines));
+    lines[*numberOfLines] = currentLine;
+    currentLine = NULL;
+    *numberOfLines += 1;
+  }
+  free(currentLine);
+  return lines;
+}
+
+size_t * getIndexOfUnderscore(char * line, size_t * numberOfUnderscore) {
+  size_t * indexOfUnderscore = NULL;
+  *numberOfUnderscore = 0;
+  for (size_t i = 0; i < strlen(line); i++) {
+    if (line[i] == '_') {
+      indexOfUnderscore = realloc(indexOfUnderscore,
+                                  (*numberOfUnderscore + 1) * sizeof(*indexOfUnderscore));
+      indexOfUnderscore[*numberOfUnderscore] = i;
+      *numberOfUnderscore += 1;
+    }
+  }
+
+  return indexOfUnderscore;
+}
+
+void checkNumberOfUnderscore(size_t numberOfUnderscore) {
+  if ((numberOfUnderscore % 2) != 0) {
+    fprintf(stderr, "A pair of matching underscores are not on the same line!\n");
+    exit(EXIT_FAILURE);
+  }
+}
+
+void checkLines(char ** lines, size_t numberOfLines) {
+  if (numberOfLines == 0) {
+    //Deal with empty file;
+  }
+
+  for (size_t i = 0; i < numberOfLines; i++) {
+    size_t numberOfUnderscore;
+    size_t * indexOfUnderscore = getIndexOfUnderscore(lines[i], &numberOfUnderscore);
+    checkNumberOfUnderscore(numberOfUnderscore);
+    if (indexOfUnderscore != NULL) {
+      free(indexOfUnderscore);
+    }
+  }
+}
+
+char ** getCategories(char * line,
+                      size_t * indexOfUnderscore,
+                      size_t numberOfUnderscore) {
+  size_t numberOfCategory = numberOfUnderscore / 2;
+
+  char ** categories = malloc(numberOfCategory * sizeof(*categories));
+  for (size_t i = 0; i < numberOfCategory; i++) {
+    size_t currentCategoryLength =
+        indexOfUnderscore[2 * i + 1] - indexOfUnderscore[2 * i];
+
+    categories[i] = malloc(currentCategoryLength * sizeof(*categories[i]));
+
+    strncpy(
+        categories[i], line + indexOfUnderscore[2 * i] + 1, currentCategoryLength - 1);
+    categories[i][currentCategoryLength - 1] = '\0';
+  }
+  return categories;
+}
+
+char ** getOtherSections(char * line,
+                         size_t * indexOfUnderscore,
+                         size_t numberOfUnderscore) {
+  size_t numberOfSections = (numberOfUnderscore / 2) + 1;
+  char ** sections = malloc(numberOfSections * sizeof(*sections));
+
+  if (numberOfSections == 1) {
+    sections[0] = malloc(strlen(line) + 1);
+    strcpy(sections[0], line);
+
+    return sections;
+  }
+
+  sections[0] = malloc((indexOfUnderscore[0] + 1) * sizeof(*sections[0]));
+  strncpy(sections[0], line, indexOfUnderscore[0]);
+  sections[0][indexOfUnderscore[0]] = '\0';
+  sections[numberOfSections - 1] =
+      malloc((strlen(line) - indexOfUnderscore[numberOfUnderscore - 1]) *
+             sizeof(*sections[numberOfSections - 1]));
+  strncpy(sections[numberOfSections - 1],
+          line + indexOfUnderscore[numberOfUnderscore - 1] + 1,
+          strlen(line) - indexOfUnderscore[numberOfUnderscore - 1]);
+  sections[numberOfSections - 1]
+          [strlen(line) - indexOfUnderscore[numberOfUnderscore - 1] - 1] = '\0';
+  for (size_t i = 1; i < numberOfSections - 1; i++) {
+    size_t currentSectionLength = indexOfUnderscore[2 * i] - indexOfUnderscore[2 * i - 1];
+    sections[i] = malloc(currentSectionLength * sizeof(*sections[i]));
+    strncpy(
+        sections[i], line + indexOfUnderscore[2 * i - 1] + 1, currentSectionLength - 1);
+    sections[i][currentSectionLength - 1] = '\0';
+  }
+
+  return sections;
+}
+
+size_t getReplacedLineSize(char ** categories,
+                           char ** sections,
+                           size_t numberOfUnderscore) {
+  size_t lengthOfChooseWords = 0;
+  size_t lengthOfSection = 0;
+
+  for (size_t i = 0; i < numberOfUnderscore / 2; i++) {
+    lengthOfChooseWords += strlen(chooseWord(categories[i], NULL));
+  }
+
+  for (size_t i = 0; i < (numberOfUnderscore) / 2 + 1; i++) {
+    lengthOfSection += strlen(sections[i]);
+  }
+
+  return lengthOfChooseWords + lengthOfSection + 1;
+}
+
+char * replaceBlocks(char * line) {
+  size_t numberOfUnderscore;
+  size_t * indexOfUnderscore = getIndexOfUnderscore(line, &numberOfUnderscore);
+  char ** categories = getCategories(line, indexOfUnderscore, numberOfUnderscore);
+  char ** sections = getOtherSections(line, indexOfUnderscore, numberOfUnderscore);
+  size_t sizeOfReplacedLine =
+      getReplacedLineSize(categories, sections, numberOfUnderscore);
+
+  char * newLine = NULL;
+  newLine = realloc(newLine, (sizeOfReplacedLine) * sizeof(*newLine));
+
+  size_t forward = 0;
+
+  for (size_t i = 0; i < numberOfUnderscore / 2; i++) {
+    strncpy(newLine + forward, sections[i], strlen(sections[i]));
+    forward += strlen(sections[i]);
+    free(sections[i]);
+    const char * wordToReplace = chooseWord(categories[i], NULL);
+    strncpy(newLine + forward, wordToReplace, strlen(wordToReplace));
+    forward += strlen(wordToReplace);
+    free(categories[i]);
+  }
+
+  strncpy(newLine + forward,
+          sections[numberOfUnderscore / 2],
+          strlen(sections[numberOfUnderscore / 2]));
+  free(sections[numberOfUnderscore / 2]);
+  free(sections);
+  free(categories);
+  free(indexOfUnderscore);
+
+  newLine[sizeOfReplacedLine - 1] = '\0';
+  return newLine;
+}
+
+void printStory(char ** lines, size_t numberOfLines) {
+  for (size_t i = 0; i < numberOfLines; i++) {
+    char * newLine = replaceBlocks(lines[i]);
+    fprintf(stdout, "%s", newLine);
+    free(newLine);
+  }
+}
+
+void freeLines(char ** lines, size_t numberOfLines) {
+  for (size_t i = 0; i < numberOfLines; i++) {
+    free(lines[i]);
+  }
+  free(lines);
+}
+
+// Step2
+
+void checkColons(char ** lines, size_t numberOfLines) {
+  if (numberOfLines == 0) {
+    // check for empty file;
+  }
+
+  for (size_t i = 0; i < numberOfLines; i++) {
+    if (strchr(lines[i], ':') == NULL) {
+      fprintf(stderr, "These is no colon in %zu th line: %s\n", i, lines[i]);
+      exit(EXIT_FAILURE);
+    }
+  }
+}
+
+char * getCategoryName(char * line) {
+  char * colonToEnd = strchr(line, ':');
+  size_t indexOfColon = colonToEnd - line;
+  char * categoryName = malloc((indexOfColon + 1) * sizeof(*categoryName));
+  strncpy(categoryName, line, indexOfColon);
+  categoryName[indexOfColon] = '\0';
+
+  return categoryName;
+}
+
+char * getCategoryWord(char * line) {
+  char * colonToEnd = strchr(line, ':');
+  size_t indexOfColon = colonToEnd - line;
+  char * categoryWord = malloc((strlen(line) - indexOfColon - 1) * sizeof(*categoryWord));
+  strncpy(categoryWord, line + indexOfColon + 1, strlen(line) - indexOfColon - 2);
+  categoryWord[strlen(line) - indexOfColon - 2] = '\0';
+
+  return categoryWord;
+}
+
+int checkNewLineDifference(char ** lines, size_t numberOfLines, char * newLine) {
+  for (size_t i = 0; i < numberOfLines; i++) {
+    if (strcmp(newLine, lines[i]) == 0) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+char ** getNamesForCategories(char ** lines,
+                              size_t numberOfLines,
+                              size_t * numberOfNames) {
+  char ** names = NULL;
+  *numberOfNames = 0;
+
+  if (numberOfLines == 0) {
+    return names;
+  }
+
+  for (size_t i = 0; i < numberOfLines; i++) {
+    char * currentName = getCategoryName(lines[i]);
+    if (checkNewLineDifference(names, *numberOfNames, currentName) == 1) {
+      names = realloc(names, (*numberOfNames + 1) * sizeof(*names));
+      names[*numberOfNames] = currentName;
+      *numberOfNames += 1;
+    }
+    else {
+      free(currentName);
+    }
+  }
+  return names;
+}
+
+char ** getWordsForName(char ** lines,
+                        size_t numberOfLines,
+                        char * name,
+                        size_t * numberOfWords) {
+  char ** words = NULL;
+  *numberOfWords = 0;
+
+  if (numberOfLines == 0) {
+    return words;
+  }
+
+  for (size_t i = 0; i < numberOfLines; i++) {
+    char * currentName = getCategoryName(lines[i]);
+    if (strcmp(name, currentName) == 0) {
+      char * currentWord = getCategoryWord(lines[i]);
+      //  int difference = checkNewLineDifference(words, *numberOfWords, currentWord);
+      // if (difference == 1) {
+      words = realloc(words, (*numberOfWords + 1) * sizeof(*words));
+      words[*numberOfWords] = currentWord;
+      *numberOfWords += 1;
+      // }
+      // else {
+      // free(currentWord);
+      // }
+    }
+    free(currentName);
+  }
+
+  return words;
+}
+
+category_t * createCategoryForName(char ** lines,
+                                   size_t numberOfLines,
+                                   char * name,
+                                   size_t * numberOfWords) {
+  category_t * category = malloc(sizeof(*category));
+
+  category->name = malloc(strlen(name) + 1);
+  strcpy(category->name, name);
+  category->words = getWordsForName(lines, numberOfLines, name, numberOfWords);
+  category->n_words = *numberOfWords;
+
+  return category;
+}
+
+catarray_t * createCategoryArray(char ** lines,
+                                 size_t numberOfLines,
+                                 size_t * numberOfCategories) {
+  catarray_t * categoryArray = malloc(sizeof(*categoryArray));
+  char ** names = getNamesForCategories(lines, numberOfLines, numberOfCategories);
+
+  categoryArray->arr = NULL;
+
+  categoryArray->arr = malloc(*numberOfCategories * sizeof(*categoryArray->arr));
+  for (size_t i = 0; i < *numberOfCategories; i++) {
+    size_t numberOfWords = 0;
+    category_t * currentCategory =
+        createCategoryForName(lines, numberOfLines, names[i], &numberOfWords);
+    free(names[i]);
+    categoryArray->arr[i] = *currentCategory;
+    free(currentCategory);
+  }
+  free(names);
+  categoryArray->n = *numberOfCategories;
+
+  return categoryArray;
+}
+
+void freeCategory(category_t category) {
+  for (size_t i = 0; i < category.n_words; i++) {
+    free(category.words[i]);
+  }
+  free(category.words);
+  free(category.name);
+}
+
+void freeCategryArray(catarray_t * categoryArray) {
+  for (size_t i = 0; i < categoryArray->n; i++) {
+    freeCategory((categoryArray->arr[i]));
+  }
+  free(categoryArray->arr);
+  free(categoryArray);
+}
+
+// Step3
+int checkNameInCatArray(char * name, catarray_t * categoryArray) {
+  for (size_t i = 0; i < categoryArray->n; i++) {
+    if (strcmp(name, categoryArray->arr[i].name) == 0) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+int checkValidInteger(char * name) {
+  char * afterDouble;
+  double valueInDouble = strtod(name, &afterDouble);
+  if (valueInDouble == 0.0 || valueInDouble < 1.0 || *afterDouble != '\0') {
+    return 0;
+  }
+  char * afterInt;
+  long valueInInt = strtol(name, &afterInt, 10);
+  if (valueInInt == 0 || valueInDouble != (double)valueInInt || *afterInt != '\0') {
+    return 0;
+  }
+
+  return 1;
+}
+
+size_t getValidInteger(char * validIntergerName) {
+  return strtol(validIntergerName, NULL, 10);
+}
+
+int checkInArrayOrValidInt(char * name, catarray_t * categoryArray) {
+  if (checkNameInCatArray(name, categoryArray) == 1) {
+    return 1;
+  }
+  else {
+    if (checkValidInteger(name) == 1) {
+      return 2;
+    }
+    else {
+      fprintf(
+          stderr,
+          "There is a block that is either not in categoryArray or a valid integer!\n");
+      exit(EXIT_FAILURE);
+    }
+  }
+}
+
+void checkValidIntOrderAndAmount(size_t validInt, category_t * usedWords) {
+  if (usedWords->n_words == 0) {
+    fprintf(stderr, "There are no used words yet!\n");
+    exit(EXIT_FAILURE);
+  }
+
+  if (validInt > usedWords->n_words) {
+    fprintf(stderr,
+            "There are only %zu used words! You can not go back %zu words before!\n",
+            usedWords->n_words,
+            validInt);
+    exit(EXIT_FAILURE);
+  }
+}
+
+void addOneUsedWord(const char * word, category_t * usedWords) {
+  usedWords->n_words += 1;
+  usedWords->words =
+      realloc(usedWords->words, (usedWords->n_words) * sizeof(*usedWords->words));
+  usedWords->words[usedWords->n_words - 1] =
+      malloc((strlen(word) + 1) * sizeof(*usedWords->words[usedWords->n_words - 1]));
+  strcpy(usedWords->words[usedWords->n_words - 1], word);
+}
+
+int checkWordReuse(const char * word, category_t * usedWord) {
+  for (size_t i = 0; i < usedWord->n_words; i++) {
+    if (strcmp(word, usedWord->words[i]) == 0) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+void checkWordsLeft(char * name, category_t * usedWords, catarray_t * categoryArray) {
+  for (size_t i = 0; i < categoryArray->n; i++) {
+    size_t usedWordsNumber = 0;
+    if (strcmp(name, categoryArray->arr[i].name) == 0) {
+      for (size_t j = 0; j < categoryArray->arr[i].n_words; j++) {
+        usedWordsNumber += checkWordReuse(categoryArray->arr[i].words[j], usedWords);
+      }
+
+      if (usedWordsNumber == categoryArray->arr[i].n_words) {
+        fprintf(stderr,
+                "There are only %zu words available for category name: %s! Can not "
+                "futherly show no-used words!\n",
+                categoryArray->arr[i].n_words,
+                categoryArray->arr[i].name);
+        exit(EXIT_FAILURE);
+      }
+    }
+  }
+}
+
+size_t getNewLineSize(char ** names,
+                      char ** sections,
+                      size_t numberOfUnderscore,
+                      category_t * usedWords,
+                      catarray_t * categoryArray,
+                      int noReuse) {
+  size_t lengthOfChooseWords = 0;
+  size_t lengthOfSection = 0;
+
+  for (size_t i = 0; i < numberOfUnderscore / 2; i++) {
+    int value = checkInArrayOrValidInt(names[i], categoryArray);
+    if (value == 1) {  // Name is in the catArray
+      const char * randomWord = chooseWord(names[i], categoryArray);
+      if (noReuse == 1) {
+        int reuse = checkWordReuse(randomWord, usedWords);
+        while (reuse == 1) {
+          randomWord = chooseWord(names[i], categoryArray);
+          reuse = checkWordReuse(randomWord, usedWords);
+          checkWordsLeft(names[i], usedWords, categoryArray);
+        }
+      }
+      lengthOfChooseWords += strlen(randomWord);
+      addOneUsedWord(randomWord, usedWords);
+    }
+    if (value == 2) {  // Name is a valid int
+      size_t validInt = getValidInteger(names[i]);
+      checkValidIntOrderAndAmount(validInt, usedWords);
+      lengthOfChooseWords += strlen(usedWords->words[usedWords->n_words - validInt]);
+      addOneUsedWord(usedWords->words[usedWords->n_words - validInt], usedWords);
+    }
+  }
+
+  for (size_t i = 0; i < (numberOfUnderscore) / 2 + 1; i++) {
+    lengthOfSection += strlen(sections[i]);
+  }
+
+  return lengthOfChooseWords + lengthOfSection + 1;
+}
+
+char * getNewLine(char * line,
+                  category_t * usedWords,
+                  catarray_t * categoryArray,
+                  int noReuse) {
+  size_t numberOfUnderscore;
+  size_t * indexOfUnderscore = getIndexOfUnderscore(line, &numberOfUnderscore);
+  char ** names = getCategories(line, indexOfUnderscore, numberOfUnderscore);
+  char ** sections = getOtherSections(line, indexOfUnderscore, numberOfUnderscore);
+  size_t originalUsedWordsNumber = usedWords->n_words;
+  size_t sizeOfNewLine = getNewLineSize(
+      names, sections, numberOfUnderscore, usedWords, categoryArray, noReuse);
+
+  char * newLine = NULL;
+  newLine = realloc(newLine, (sizeOfNewLine) * sizeof(*newLine));
+
+  size_t forward = 0;
+
+  for (size_t i = 0; i < numberOfUnderscore / 2; i++) {
+    strncpy(newLine + forward, sections[i], strlen(sections[i]));
+    forward += strlen(sections[i]);
+    free(sections[i]);
+    const char * wordToReplace = usedWords->words[originalUsedWordsNumber + i];
+    strncpy(newLine + forward, wordToReplace, strlen(wordToReplace));
+    forward += strlen(wordToReplace);
+    free(names[i]);
+  }
+
+  strncpy(newLine + forward,
+          sections[numberOfUnderscore / 2],
+          strlen(sections[numberOfUnderscore / 2]));
+  free(sections[numberOfUnderscore / 2]);
+  free(sections);
+  free(names);
+  free(indexOfUnderscore);
+
+  newLine[sizeOfNewLine - 1] = '\0';
+  return newLine;
+}
+
+void printNewStory(char ** lines,
+                   size_t numberOfLines,
+                   category_t * usedWords,
+                   catarray_t * categoryArray,
+                   int noReuse) {
+  for (size_t i = 0; i < numberOfLines; i++) {
+    char * newLine = getNewLine(lines[i], usedWords, categoryArray, noReuse);
+    fprintf(stdout, "%s", newLine);
+    free(newLine);
+  }
+}
+
+// step4
+void freeUsedWords(category_t usedWords) {
+  for (size_t i = 0; i < usedWords.n_words; i++) {
+    free(usedWords.words[i]);
+  }
+  free(usedWords.words);
+}
